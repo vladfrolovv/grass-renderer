@@ -13,11 +13,11 @@ namespace Game.Scripts.Runtime.Terrain
         [SerializeField] private MeshFilter _meshFilter;
 
         [Header("Mesh Configuration")]
-        [Range(1, 100)]
+        [Range(1, 1000)]
         [SerializeField] private int _width;
 
-        [Range(1, 100)]
-        [SerializeField] private int _height;
+        [Range(1, 1000)]
+        [SerializeField] private int _length;
 
         [Range(1, 100)]
         [SerializeField] private float _scale;
@@ -25,14 +25,32 @@ namespace Game.Scripts.Runtime.Terrain
         [Range(1, 100)]
         [SerializeField] private int _octaves;
 
+        [Header("Height Configuration")]
+        [SerializeField] private AnimationCurve _heightCurve;
+
+        [Range(1, 100)]
+        [SerializeField] private float _amplitude;
+
+        [Range(1, 100)]
+        [SerializeField] private float _frequency;
+
+        [Range(0, 1)]
+        [SerializeField] private float _persistence;
+
+        [Range(1, 100)]
+        [SerializeField] private float _lacunarity;
+
+        [Range(-25, 25)]
+        [SerializeField] private float _minHeight;
+
+        [Range(-25, 25)]
+        [SerializeField] private float _maxHeight;
+
         private Mesh _mesh;
 
         public void Generate()
         {
-            _mesh = new Mesh();
-            _meshFilter.mesh = _mesh;
-
-            UpdateMesh(
+            _mesh = CreateMeshFrom(
                 GenerateMeshVertices(),
                 GenerateMeshTriangles());
         }
@@ -44,71 +62,110 @@ namespace Game.Scripts.Runtime.Terrain
 
         private Vector3[] GenerateMeshVertices()
         {
-            List<Vector3> vertices = new List<Vector3>();
+            Vector3[] vertices = new Vector3[(_width + 1) * (_length + 1)];
+            int vertexIndex = 0;
+
             List<Vector2> offsets = CreteOffsetsList();
 
-            for (int y = 0; y < _height; y++)
+            for (int z = 0; z < _length; z++)
             {
                 for (int x = 0; x < _width; x++)
                 {
-                    float noiseHeight = Random.Range(-1, 1); // todo implement noise noise
-                    vertices.Add(new Vector3(x, noiseHeight, y));
+                    float noiseHeight = ClampHeight(
+                        CreateNoiseHeight(z, x, offsets));
+
+                    vertices[vertexIndex] = (new Vector3(x, noiseHeight, z));
+                    vertexIndex++;
                 }
             }
 
-            return vertices.ToArray();
+            return vertices;
         }
 
         private int[] GenerateMeshTriangles()
         {
-            List<int> triangles = new List<int>();
+            int[] triangles = new int[_width * _length * 6];
 
             int verticesIndex = 0;
-            for (int y = 0; y < _height - 1; y++)
+            int triangleIndex = 0;
+            for (int z = 0; z < _length; z++)
             {
-                for (int x = 0; x < _width - 1; x++)
+                for (int x = 0; x < _width; x++)
                 {
-                    triangles.Add(verticesIndex);
-                    triangles.Add(verticesIndex + _width);
-                    triangles.Add(verticesIndex + _width + 1);
-
-                    triangles.Add(verticesIndex);
-                    triangles.Add(verticesIndex + _width + 1);
-                    triangles.Add(verticesIndex + 1);
+                    triangles[triangleIndex + 0] = verticesIndex + 0;
+                    triangles[triangleIndex + 1] = verticesIndex + _width + 1;
+                    triangles[triangleIndex + 2] = verticesIndex + 1;
+                    triangles[triangleIndex + 3] = verticesIndex + 1;
+                    triangles[triangleIndex + 4] = verticesIndex + _width + 1;
+                    triangles[triangleIndex + 5] = verticesIndex + _width + 2;
 
                     verticesIndex++;
+                    triangleIndex += 6;
                 }
 
                 verticesIndex++;
             }
 
-            return triangles.ToArray();
+            return triangles;
         }
 
-        private void UpdateMesh(Vector3[] vertices, int[] triangles)
+        private Mesh CreateMeshFrom(Vector3[] vertices, int[] triangles)
         {
-            _mesh.Clear();
-            _mesh.vertices = vertices;
-            _mesh.triangles = triangles;
+            Mesh mesh = new Mesh
+            {
+                vertices = vertices,
+                triangles = triangles,
+            };
 
-            _mesh.RecalculateNormals();
-            _mesh.RecalculateTangents();
+            mesh.RecalculateNormals();
+            mesh.RecalculateTangents();
 
-            _meshFilter.sharedMesh = _mesh;
+            _meshFilter.sharedMesh = mesh;
+
+            return mesh;
         }
 
         private List<Vector2> CreteOffsetsList()
         {
+            _seed = Random.Range(0, 1000);
+
+            System.Random random = new System.Random(_seed);
             List<Vector2> offsets = new List<Vector2>();
 
             for (int i = 0; i < _octaves; i++)
             {
                 offsets.Add(new Vector2(
-                    Random.Range(-10000, 10000),
-                    Random.Range(-10000, 10000)));
+                    random.Next(-10000, 10000),
+                    random.Next(-10000, 10000)));
             }
 
             return offsets;
+        }
+
+        private float CreateNoiseHeight(int z, int x, List<Vector2> offsets)
+        {
+            float frequency = _frequency;
+            float amplitude = _amplitude;
+            float noiseHeight = 0;
+
+            for (int i = 0; i < _octaves; i++)
+            {
+                float xCoordinate = x / _scale * frequency + offsets[i].x;
+                float zCoordinate = z / _scale * frequency + offsets[i].y;
+
+                float perlinValue = Mathf.PerlinNoise(zCoordinate, xCoordinate) * 2 - 1;
+                noiseHeight += _heightCurve.Evaluate(perlinValue) * amplitude;
+
+                frequency *= _lacunarity;
+                amplitude *= _persistence;
+            }
+
+            return noiseHeight;
+        }
+
+        private float ClampHeight(float height)
+        {
+            return Mathf.Clamp(height, _minHeight, _maxHeight);
         }
 
     }
