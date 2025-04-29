@@ -27,6 +27,8 @@ namespace GrassRenderer.Terrain
         private Vector3[] _vertices;
         private int[] _triangles;
 
+        public int TerrainSize => _terrainSize * _sizeScale;
+
         public void GenerateNewTerrain()
         {
             _terrainMesh = new Mesh();
