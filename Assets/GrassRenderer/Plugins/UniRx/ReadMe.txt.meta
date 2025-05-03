@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 25ec1021804454bd68c19bd5c3c1d575
+timeCreated: 1455373909
+licenseType: Store
+TextScriptImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 17276
+  packageName: UniRx - Reactive Extensions for Unity
+  packageVersion: 7.1.0
+  assetPath: Assets/Plugins/UniRx/ReadMe.txt
+  uploadId: 318694

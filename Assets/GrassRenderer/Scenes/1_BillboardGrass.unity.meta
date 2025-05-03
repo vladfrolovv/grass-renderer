@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 1bb8f3f60dc53cd49bcb7f167be8a564
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 157735
+  packageName: Extenject Dependency Injection IOC
+  packageVersion: 9.2.0
+  assetPath: Assets/Plugins/Zenject/OptionalExtras/AutoMocking.zip
+  uploadId: 370902
