@@ -4,6 +4,8 @@ namespace GrassRenderer.Camera
 {
     public class CameraController : MonoBehaviour
     {
+
+        [SerializeField] private bool _isActive = true;
         [SerializeField] private float _sensitivity = 3f;
 
         [SerializeField] private float _minX = -60f;
@@ -17,6 +19,7 @@ namespace GrassRenderer.Camera
 
         private void Awake()
         {
+            if (!_isActive) return;
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
 
