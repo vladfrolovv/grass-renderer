@@ -5,7 +5,6 @@
 struct GrassData {
 	float4 position;
 	float2 uv;
-	float displacement;
 };
 
 RWStructuredBuffer<GrassData> _GrassDataBuffer;
@@ -21,9 +20,10 @@ void InitializeGrass(uint3 id : SV_DispatchThreadID) {
 		GrassData grass;
 		float4 pos = 0.0f;
 		pos.xz = (id.xy - float(_Dimension) * 0.5) * (1.0f / float(_Scale));
+		pos.z += float(_Dimension) * 0.5;
 
-		pos.x += SimplexNoiseGrad(float3(pos.xz, 0.0f) * 3.0f) * 0.05f;
-		pos.z += SimplexNoiseGrad(float3(pos.xz, 0.0f) * 4.0f) * 0.05f;
+		// pos.x += SimplexNoiseGrad(float3(pos.xz, 0.0f) * 3.0f) * 0.05f;
+		// pos.z += SimplexNoiseGrad(float3(pos.xz, 0.0f) * 4.0f) * 0.05f;
 
 		float2 uv = pos.xz;
 		uv = (id.xy) * (1.0f / float(_Scale));
@@ -31,16 +31,7 @@ void InitializeGrass(uint3 id : SV_DispatchThreadID) {
 		uv.y = 1 - uv.y;
 		uv.x = 1 - uv.x;
 
-		float4 displacement = _HeightMap.SampleLevel(sampler_HeightMap, uv, 0);
-
-		pos.y += displacement.r * _DisplacementStrength + 0.5f;
-
-		float noise = abs(SimplexNoiseGrad(float3(pos.xz, 0.0f) * 0.2f));
-
-		pos.w = lerp(0.3f, 0.6f, noise);
-
 		grass.position = pos;
-		grass.displacement = displacement.r * _DisplacementStrength;
 		grass.uv = uv;
 
 		_GrassDataBuffer[id.x + id.y * _Dimension] = grass;

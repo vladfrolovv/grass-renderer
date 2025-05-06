@@ -37,6 +37,7 @@ Shader "Unlit/BillboardGrass"
 
             struct GrassData {
                 float4 position;
+                float2 uv;
             };
 
             sampler2D _MainTex, _HeightMap;

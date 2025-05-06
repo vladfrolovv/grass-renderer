@@ -26,16 +26,13 @@ namespace GrassRenderer.MeshGrass
                     Vector3 position = new (
                         x * _meshGrassInfo.BoxSize - _terrainMeshGenerator.TerrainSize / 2f + _meshGrassInfo.BoxSize / 2f, 0,
                         z * _meshGrassInfo.BoxSize + _meshGrassInfo.BoxSize / 2f);
+
                     position += new Vector3(
-                        Random.Range(-_meshGrassInfo.BoxSize / 2f, _meshGrassInfo.BoxSize / 2f),
-                        0,
+                        Random.Range(-_meshGrassInfo.BoxSize / 2f, _meshGrassInfo.BoxSize / 2f), 0,
                         Random.Range(-_meshGrassInfo.BoxSize / 2f, _meshGrassInfo.BoxSize / 2f));
 
                     grassObject.transform.position = position;
-                    grassObject.transform.localRotation = Quaternion.Euler(
-                        0,
-                        Random.Range(0, 360),
-                        0);
+                    grassObject.transform.localRotation = Quaternion.Euler(0, Random.Range(0, 360), 0);
                 }
             }
         }

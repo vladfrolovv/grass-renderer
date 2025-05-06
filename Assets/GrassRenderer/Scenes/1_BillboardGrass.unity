@@ -508,7 +508,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1594405375
 Transform:
   m_ObjectHideFlags: 0
@@ -536,7 +536,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca05751e71c1410794f8d43af7bedaf8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _resolution: 100
+  _resolution: 64
   _scale: 1
   _displacementStrength: 200
   _quadSize: {x: -500, y: 200, z: 500}
@@ -546,7 +546,7 @@ MonoBehaviour:
   _positionBufferPropertyName: _PositionBuffer
   _rotationPropertyName: _Rotation
   _computeShaderPath: ComputeShaders/GrassPositionsCalculator
-  _dimensionsPropertyName: _Dimensions
+  _dimensionsPropertyName: _Dimension
   _scalePropertyName: _Scale
   _displacementStrengthPropertyName: _DisplacementStrength
   _heightMapPropertyName: _HeightMap
@@ -710,57 +710,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1838095989}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &1839293857
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1839293859}
-  - component: {fileID: 1839293858}
-  m_Layer: 0
-  m_Name: BillboardGrass (1)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1839293858
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1839293857}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8f98f0345a4d4b5b81b8144c320cfb7e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  resolution: 100
-  scale: 1
-  displacementStrength: 200
-  grassMaterial: {fileID: 2100000, guid: 71ebd298108844ad29f687f21ee54f19, type: 2}
-  grassMesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-  heightMap: {fileID: 2800000, guid: 4ecbc3f2458b8447484ffa549e5c6cd4, type: 3}
-  updateGrass: 0
---- !u!4 &1839293859
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1839293857}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1948990375
 GameObject:
   m_ObjectHideFlags: 0
@@ -852,4 +801,3 @@ SceneRoots:
   - {fileID: 508145315}
   - {fileID: 1780059574}
   - {fileID: 1594405375}
-  - {fileID: 1839293859}

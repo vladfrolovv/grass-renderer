@@ -5,7 +5,7 @@ namespace GrassRenderer.BillboardGrass
     public class BillboardGrass : MonoBehaviour
     {
 
-        private const int GrassDataStride = 28;
+        private const int GrassDataStride = 48;
 
         private const int IndirectArgsCount = 5;
         private const int IndirectArgsStride = sizeof(uint) * IndirectArgsCount;
@@ -27,7 +27,7 @@ namespace GrassRenderer.BillboardGrass
 
         [Header("Compute Shader")]
         [SerializeField] private string _computeShaderPath = "ComputeShaders/GrassPositionsCalculator";
-        [SerializeField] private string _dimensionsPropertyName = "_Dimensions";
+        [SerializeField] private string _dimensionsPropertyName = "_Dimension";
         [SerializeField] private string _scalePropertyName = "_Scale";
         [SerializeField] private string _displacementStrengthPropertyName = "_DisplacementStrength";
         [SerializeField] private string _heightMapPropertyName = "_HeightMap";
@@ -43,6 +43,13 @@ namespace GrassRenderer.BillboardGrass
         private Material _grassMaterial2;
         private Material _grassMaterial3;
 
+        public void UpdateGrassBuffer()
+        {
+            UpgradeGrassInitialization();
+            UpgradeGrassArguments();
+            UpgradeGrassMaterials();
+        }
+
         private void Awake()
         {
             _resolution *= _scale;
@@ -53,13 +60,6 @@ namespace GrassRenderer.BillboardGrass
 
             UpdateGrassBuffer();
             Observable.EveryUpdate().Subscribe(_ => OnGrassUpdate()).AddTo(this);
-        }
-
-        private void UpdateGrassBuffer()
-        {
-            UpgradeGrassInitialization();
-            UpgradeGrassArguments();
-            UpgradeGrassMaterials();
         }
 
         private void UpgradeGrassInitialization()
