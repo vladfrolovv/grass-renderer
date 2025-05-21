@@ -87,7 +87,7 @@ Shader "Unlit/BillboardGrass"
 
                 localPosition.x += v.uv.y * trigValue * grassPosition.w * localWindVariance * 0.6f;
                 localPosition.z += v.uv.y * trigValue * grassPosition.w * 0.4f;
-                localPosition.y *= v.uv.y * (0.5f + grassPosition.w);
+                // localPosition.y += v.uv.y * (0.5f + grassPosition.w);
 
                 float4 worldPosition = float4(grassPosition.xyz + localPosition, 1.0f);
 

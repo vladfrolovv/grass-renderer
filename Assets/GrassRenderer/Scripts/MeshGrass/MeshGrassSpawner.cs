@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using GrassRenderer.Terrain;
-using UnityEngine;
+﻿using UnityEngine;
 namespace GrassRenderer.MeshGrass
 {
     public class MeshGrassSpawner : MonoBehaviour

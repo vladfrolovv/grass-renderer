@@ -2,7 +2,7 @@
 using UnityEngine;
 namespace GrassRenderer.Editor.Tools
 {
-    [CustomEditor(typeof(BillboardGrass.BillboardGrass))]
+    [CustomEditor(typeof(BillboardGrass.BillboardGrassGenerator))]
     public class BillboardGrassEditor : UnityEditor.Editor
     {
 
@@ -10,11 +10,11 @@ namespace GrassRenderer.Editor.Tools
         {
             base.OnInspectorGUI();
 
-            BillboardGrass.BillboardGrass billboardGrass = (BillboardGrass.BillboardGrass)target;
+            BillboardGrass.BillboardGrassGenerator billboardGrassGenerator = (BillboardGrass.BillboardGrassGenerator)target;
 
             if (GUILayout.Button("Update"))
             {
-                billboardGrass.UpdateGrassBuffer();
+                billboardGrassGenerator.UpdateGrassBuffer();
             }
         }
 

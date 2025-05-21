@@ -2,7 +2,7 @@
 using UnityEngine;
 namespace GrassRenderer.Editor.Tools
 {
-    [CustomEditor(typeof(Terrain.TerrainMeshGenerator))]
+    [CustomEditor(typeof(TerrainMeshGenerator))]
     public class TerrainMeshGeneratorEditor : UnityEditor.Editor
     {
 
@@ -10,7 +10,7 @@ namespace GrassRenderer.Editor.Tools
         {
             base.OnInspectorGUI();
 
-            Terrain.TerrainMeshGenerator terrainMeshGenerator = (Terrain.TerrainMeshGenerator)target;
+            TerrainMeshGenerator terrainMeshGenerator = (TerrainMeshGenerator)target;
 
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("Generate New Terrain"))
