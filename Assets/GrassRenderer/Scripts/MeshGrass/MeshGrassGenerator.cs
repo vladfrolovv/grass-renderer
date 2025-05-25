@@ -1,5 +1,9 @@
-﻿using GrassRenderer.Terrain;
+﻿using System;
+using System.Collections.Generic;
+using GrassRenderer.Terrain;
+using UniRx;
 using UnityEngine;
+using Random = UnityEngine.Random;
 namespace GrassRenderer.MeshGrass
 {
     public class MeshGrassGenerator : GrassGenerator
@@ -12,6 +16,11 @@ namespace GrassRenderer.MeshGrass
 
         [Header("Terrain References")]
         [SerializeField] private TerrainMeshGenerator _terrainMeshGenerator;
+
+        private readonly List<Transform> _grassTransforms = new();
+        private readonly Subject<IEnumerable<Transform>> _onGrassTransformsUpdate = new();
+
+        public IObservable<IEnumerable<Transform>> OnGrassTransformsUpdate => _onGrassTransformsUpdate;
 
         public override void GenerateGrass(TerrainInfo terrainInfo)
         {
@@ -32,8 +41,12 @@ namespace GrassRenderer.MeshGrass
 
                     grassObject.transform.position = position;
                     grassObject.transform.localRotation = Quaternion.Euler(0, Random.Range(0, 360), 0);
+
+                    _grassTransforms.Add(grassObject.transform);
                 }
             }
+
+            _onGrassTransformsUpdate.OnNext(_grassTransforms);
         }
 
         public void ClearGrass()
@@ -41,6 +54,9 @@ namespace GrassRenderer.MeshGrass
             while (_grassParent.childCount > 0) {
                 DestroyImmediate(_grassParent.GetChild(0).gameObject);
             }
+
+            _grassTransforms.Clear();
+            _onGrassTransformsUpdate.OnNext(_grassTransforms);
         }
 
     }
