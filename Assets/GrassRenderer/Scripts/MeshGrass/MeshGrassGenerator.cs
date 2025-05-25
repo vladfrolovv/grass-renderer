@@ -1,7 +1,8 @@
-﻿using UnityEngine;
+﻿using GrassRenderer.Terrain;
+using UnityEngine;
 namespace GrassRenderer.MeshGrass
 {
-    public class MeshGrassSpawner : MonoBehaviour
+    public class MeshGrassGenerator : GrassGenerator
     {
 
         [Header("Mesh Grass Info")]
@@ -12,8 +13,8 @@ namespace GrassRenderer.MeshGrass
         [Header("Terrain References")]
         [SerializeField] private TerrainMeshGenerator _terrainMeshGenerator;
 
-        public void GenerateGrass()
-        { 
+        public override void GenerateGrass(TerrainInfo terrainInfo)
+        {
             ClearGrass();
             int grassCount = Mathf.RoundToInt(_terrainMeshGenerator.TerrainSize / _meshGrassInfo.BoxSize);
             for (int z = 0; z < grassCount; z++)

@@ -26,11 +26,14 @@ namespace GrassRenderer
         [SerializeField, Range(1, 100)] private int _sizeScale;
 
         [Header("Grass")]
+        [SerializeField] private bool _upgradeGrassGenerator;
         [SerializeField] private GrassGenerator _grassGenerator;
 
         private Mesh _terrainMesh;
         private Vector3[] _vertices;
         private int[] _triangles;
+
+        private TerrainInfo _info;
 
         public int TerrainSize => _terrainSize * _sizeScale;
 
@@ -41,6 +44,7 @@ namespace GrassRenderer
 
         public void GenerateNewTerrain()
         {
+            _info = new TerrainInfo(_heightMapTexture, _terrainHeight, TerrainSize, _sizeScale);
             _terrainMesh = new Mesh();
             if (_useHeightMap)
             {
@@ -53,8 +57,10 @@ namespace GrassRenderer
 
             UpdateMesh();
 
-            _grassGenerator
-                .GenerateGrass(new TerrainInfo(_heightMapTexture, _terrainHeight, TerrainSize, _sizeScale));
+            if (_upgradeGrassGenerator)
+            {
+                _grassGenerator.GenerateGrass(_info);
+            }
         }
 
         public void ClearMesh()
@@ -62,7 +68,10 @@ namespace GrassRenderer
             _vertices = Array.Empty<Vector3>();
             _triangles = Array.Empty<int>();
 
-            _terrainMesh.Clear();
+            if (_terrainMesh != null)
+            {
+                _terrainMesh.Clear();
+            }
             _meshFilter.mesh = null;
         }
 
@@ -106,8 +115,8 @@ namespace GrassRenderer
                 {
                     int px = Mathf.Clamp(x * tex.width / size, 0, tex.width - 1);
                     int pz = Mathf.Clamp(z * tex.height / size, 0, tex.height - 1);
-                    float heightNorm = pixels[pz * (int)rect.width + px].r;
-                    float y = heightNorm * _terrainHeight;
+                    float heightNormal = pixels[pz * (int)rect.width + px].r;
+                    float y = heightNormal * _terrainHeight;
 
                     _vertices[i++] = new Vector3(x * _sizeScale, y, z * _sizeScale);
                 }
