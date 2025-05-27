@@ -7,6 +7,10 @@ struct GrassData {
 	float2 uv;
 };
 
+const float X_Noise_Offset = 3.0f;
+const float Z_Noise_Offset = 4.0f;
+const float Noise_Multiplier = 0.1f;
+
 RWStructuredBuffer<GrassData> _GrassDataBuffer;
 Texture2D<float4> _HeightMap;
 SamplerState sampler_HeightMap;
@@ -15,15 +19,18 @@ int _Dimension, _Scale;
 float _DisplacementStrength;
 
 [numthreads(8,8,1)]
-void InitializeGrass(uint3 id : SV_DispatchThreadID) {
-	if (id.x < uint(_Dimension) && id.y < uint(_Dimension)) {
+void InitializeGrass(uint3 id : SV_DispatchThreadID)
+{
+	if (id.x < uint(_Dimension) && id.y < uint(_Dimension))
+	{
+
 		GrassData grass;
 		float4 pos = 0.0f;
 		pos.xz = (id.xy - float(_Dimension) * 0.5) * (1.0f / float(_Scale));
 		pos.z += float(_Dimension) * 0.5;
 
-		// pos.x += SimplexNoiseGrad(float3(pos.xz, 0.0f) * 3.0f) * 0.05f;
-		// pos.z += SimplexNoiseGrad(float3(pos.xz, 0.0f) * 4.0f) * 0.05f;
+		pos.x += SimplexNoiseGrad(float3(pos.x, 0.0f, pos.z) * X_Noise_Offset) * Noise_Multiplier;
+		pos.z += SimplexNoiseGrad(float3(pos.x, 0.0f, pos.z) * Z_Noise_Offset) * Noise_Multiplier;
 
 		float2 uv = pos.xz;
 		uv = (id.xy) * (1.0f / float(_Scale));

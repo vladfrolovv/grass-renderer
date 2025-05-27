@@ -47,6 +47,7 @@ namespace GrassRenderer.MeshGrass
             }
 
             _onGrassTransformsUpdate.OnNext(_grassTransforms);
+            AnalyticsController.RefreshMeshCache();
         }
 
         public void ClearGrass()

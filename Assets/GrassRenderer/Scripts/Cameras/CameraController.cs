@@ -1,6 +1,6 @@
 ﻿using UniRx;
 using UnityEngine;
-namespace GrassRenderer.Camera
+namespace GrassRenderer.Cameras
 {
     public class CameraController : MonoBehaviour
     {

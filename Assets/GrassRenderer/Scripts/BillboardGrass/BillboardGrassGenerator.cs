@@ -61,6 +61,8 @@ namespace GrassRenderer.BillboardGrass
             UpgradeGrassInitialization();
             UpgradeGrassArguments();
             UpgradeGrassMaterials();
+
+            AnalyticsController.RefreshMeshCache();
         }
 
         private void UpgradeGrassInitialization()
