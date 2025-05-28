@@ -35,8 +35,9 @@ namespace GrassRenderer.MeshGrass
                         x * _meshGrassInfo.BoxSize - _terrainMeshGenerator.TerrainSize / 2f + _meshGrassInfo.BoxSize / 2f, 0,
                         z * _meshGrassInfo.BoxSize + _meshGrassInfo.BoxSize / 2f);
 
+                    float yOffset = _terrainMeshGenerator.SampleHeightAtPosition(position);
                     position += new Vector3(
-                        Random.Range(-_meshGrassInfo.BoxSize / 2f, _meshGrassInfo.BoxSize / 2f), 0,
+                        Random.Range(-_meshGrassInfo.BoxSize / 2f, _meshGrassInfo.BoxSize / 2f), yOffset,
                         Random.Range(-_meshGrassInfo.BoxSize / 2f, _meshGrassInfo.BoxSize / 2f));
 
                     grassObject.transform.position = position;

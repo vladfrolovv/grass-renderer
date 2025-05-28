@@ -142,6 +142,32 @@ namespace GrassRenderer
             }
         }
 
+        public float SampleHeightAtPosition(Vector3 worldPos)
+        {
+            Texture2D tex  = _heightMapTexture.texture;
+            Rect     rect  = _heightMapTexture.textureRect;
+            int      size  = _terrainSize;
+
+            Color[] pixels = tex.GetPixels(
+                (int)rect.x,
+                (int)rect.y,
+                (int)rect.width,
+                (int)rect.height);
+
+            float halfSizeWorld = size * _sizeScale * 0.5f;
+            float localX = (worldPos.x + halfSizeWorld) / _sizeScale;
+            float localZ =  worldPos.z / _sizeScale;
+
+            int ix = Mathf.Clamp(Mathf.RoundToInt(localX), 0, size);
+            int iz = Mathf.Clamp(Mathf.RoundToInt(localZ), 0, size);
+
+            int px = Mathf.Clamp(ix * tex.width  / size, 0, tex.width  - 1);
+            int pz = Mathf.Clamp(iz * tex.height / size, 0, tex.height - 1);
+
+            float heightNormal = pixels[pz * (int)rect.width + px].r;
+            return heightNormal * _terrainHeight;
+        }
+
         private void UpdateMesh()
         {
             _terrainMesh.Clear();
