@@ -12,7 +12,7 @@ Texture2D<float4> _HeightMap;
 SamplerState sampler_HeightMap;
 
 int _Dimension, _Scale, _NoiseScale;
-float _DisplacementStrength;
+float _DisplacementStrength, _YOffset;
 
 float snoise3(float3 v) { return frac(sin(dot(v, float3(12.9898,78.233,37.719))) * 43758.5453); }
 
@@ -29,13 +29,12 @@ void InitializeGrass(uint3 id : SV_DispatchThreadID)
 
 	float4 pos = 0;
 	pos.xz = baseXZ;
-	pos.z += float(_Dimension) * 0.5;
 	pos.y  = 0.75f;
 
 	float2 uvHM = id.xy / float(_Dimension);
 	float h = _HeightMap.SampleLevel(sampler_HeightMap, uvHM, 0).r;
 	pos.x += snoise3(float3(baseXZ.x, baseXZ.y, 0.0)) * _NoiseScale;
-	pos.z += snoise3(float3(baseXZ.x, baseXZ.y, 0.0)) * _NoiseScale;
+	pos.z += snoise3(float3(baseXZ.x, baseXZ.y, 0.0)) * _NoiseScale + float(_Dimension) * 0.5;
 	pos.y += h * _DisplacementStrength;
 
 	float2 uv = pos.xz;

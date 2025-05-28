@@ -13,6 +13,7 @@ namespace GrassRenderer.BillboardGrass
 
         [Header("Grass Settings")]
         [SerializeField] private Vector3 _quadSize;
+        [SerializeField] private float _grassScale = 1.5f;
         [SerializeField] private float _noiseScale = 0.1f;
         [SerializeField] private Texture _heightMap;
 
@@ -23,6 +24,7 @@ namespace GrassRenderer.BillboardGrass
         [SerializeField] private Material _grassMaterial;
         [SerializeField] private string _positionBufferPropertyName = "_PositionBuffer";
         [SerializeField] private string _rotationPropertyName = "_Rotation";
+        [SerializeField] private string _grassQuadScalePropertyName = "_QuadScale";
 
         [Header("Compute Shader")]
         [SerializeField] private string _computeShaderPath = "ComputeShaders/GrassPositionsCalculator";
@@ -31,6 +33,7 @@ namespace GrassRenderer.BillboardGrass
         [SerializeField] private string _displacementStrengthPropertyName = "_DisplacementStrength";
         [SerializeField] private string _noiseScalePropertyName = "_NoiseScale";
         [SerializeField] private string _heightMapPropertyName = "_HeightMap";
+        [SerializeField] private string _yOffsetPropertyName = "_YOffset";
         [SerializeField] private string _grassDataBufferPropertyName = "_GrassDataBuffer";
         [SerializeField] private string _grassMaterialPropertyName = "_GrassMaterial";
         [SerializeField] private string _grassMeshPropertyName = "_GrassMesh";
@@ -76,6 +79,8 @@ namespace GrassRenderer.BillboardGrass
             _grassInitializationShader.SetTexture(0, _heightMapPropertyName, _heightMap);
             _grassInitializationShader.SetFloat(_displacementStrengthPropertyName, _terrainInfo.HeightScale);
             _grassInitializationShader.SetFloat(_noiseScalePropertyName, _noiseScale);
+            _grassInitializationShader.SetFloat(_yOffsetPropertyName, _grassScale / 2f);
+            _grassInitializationShader.SetFloat(_noiseScalePropertyName, _noiseScale);
             _grassInitializationShader.Dispatch(0,
                 Mathf.CeilToInt(resolution / 8f),
                 Mathf.CeilToInt(resolution / 8f), 1);
@@ -98,16 +103,19 @@ namespace GrassRenderer.BillboardGrass
             _grassMaterial1.SetBuffer(_positionBufferPropertyName, _grassDataBuffer);
             _grassMaterial1.SetFloat(_rotationPropertyName, 0.0f);
             _grassMaterial1.SetFloat(_displacementStrengthPropertyName, _terrainInfo.HeightScale);
+            _grassMaterial1.SetFloat(_grassQuadScalePropertyName, _grassScale);
 
             _grassMaterial2 = new Material(_grassMaterial);
             _grassMaterial2.SetBuffer(_positionBufferPropertyName, _grassDataBuffer);
             _grassMaterial2.SetFloat(_rotationPropertyName, 50.0f);
             _grassMaterial2.SetFloat(_displacementStrengthPropertyName, _terrainInfo.HeightScale);
+            _grassMaterial2.SetFloat(_grassQuadScalePropertyName, _grassScale);
 
             _grassMaterial3 = new Material(_grassMaterial);
             _grassMaterial3.SetBuffer(_positionBufferPropertyName, _grassDataBuffer);
             _grassMaterial3.SetFloat(_rotationPropertyName, -50.0f);
             _grassMaterial3.SetFloat(_displacementStrengthPropertyName, _terrainInfo.HeightScale);
+            _grassMaterial3.SetFloat(_grassQuadScalePropertyName, _grassScale);
         }
 
         private void OnGrassUpdate()

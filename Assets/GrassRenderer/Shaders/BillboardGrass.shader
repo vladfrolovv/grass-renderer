@@ -6,7 +6,6 @@ Shader "Unlit/BillboardGrass"
         _WindStrength ("Wind Strength", Range(0.5, 50.0)) = 1
         _CullingBias ("Cull Bias", Range(0.1, 1.0)) = 0.5
         _LODCutoff ("LOD Cutoff", Range(10.0, 500.0)) = 100
-        _QuadScale ("Quad Scale", Float) = 1.0
     }
     SubShader
     {
