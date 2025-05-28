@@ -13,6 +13,7 @@ namespace GrassRenderer.BillboardGrass
 
         [Header("Grass Settings")]
         [SerializeField] private Vector3 _quadSize;
+        [SerializeField] private float _noiseScale = 0.1f;
         [SerializeField] private Texture _heightMap;
 
         [Header("Shape")]
@@ -28,6 +29,7 @@ namespace GrassRenderer.BillboardGrass
         [SerializeField] private string _dimensionsPropertyName = "_Dimension";
         [SerializeField] private string _scalePropertyName = "_Scale";
         [SerializeField] private string _displacementStrengthPropertyName = "_DisplacementStrength";
+        [SerializeField] private string _noiseScalePropertyName = "_NoiseScale";
         [SerializeField] private string _heightMapPropertyName = "_HeightMap";
         [SerializeField] private string _grassDataBufferPropertyName = "_GrassDataBuffer";
         [SerializeField] private string _grassMaterialPropertyName = "_GrassMaterial";
@@ -73,6 +75,7 @@ namespace GrassRenderer.BillboardGrass
             _grassInitializationShader.SetBuffer(0, _grassDataBufferPropertyName, _grassDataBuffer);
             _grassInitializationShader.SetTexture(0, _heightMapPropertyName, _heightMap);
             _grassInitializationShader.SetFloat(_displacementStrengthPropertyName, _terrainInfo.HeightScale);
+            _grassInitializationShader.SetFloat(_noiseScalePropertyName, _noiseScale);
             _grassInitializationShader.Dispatch(0,
                 Mathf.CeilToInt(resolution / 8f),
                 Mathf.CeilToInt(resolution / 8f), 1);

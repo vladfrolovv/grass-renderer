@@ -1,46 +1,51 @@
 #pragma kernel InitializeGrass
 
-#include "SimplexNoise3D.hlsl"
+// #include "Noise.hlsl"
 
 struct GrassData {
 	float4 position;
 	float2 uv;
 };
 
-const float X_Noise_Offset = 3.0f;
-const float Z_Noise_Offset = 4.0f;
-const float Noise_Multiplier = 0.1f;
-
 RWStructuredBuffer<GrassData> _GrassDataBuffer;
 Texture2D<float4> _HeightMap;
 SamplerState sampler_HeightMap;
 
-int _Dimension, _Scale;
+int _Dimension, _Scale, _NoiseScale;
 float _DisplacementStrength;
+
+float snoise3(float3 v) { return frac(sin(dot(v, float3(12.9898,78.233,37.719))) * 43758.5453); }
 
 [numthreads(8,8,1)]
 void InitializeGrass(uint3 id : SV_DispatchThreadID)
 {
-	if (id.x < uint(_Dimension) && id.y < uint(_Dimension))
-	{
+	if (id.x >= uint(_Dimension) || id.y >= uint(_Dimension)) return;
 
-		GrassData grass;
-		float4 pos = 0.0f;
-		pos.xz = (id.xy - float(_Dimension) * 0.5) * (1.0f / float(_Scale));
-		pos.z += float(_Dimension) * 0.5;
+	GrassData grass;
+	float2 baseXZ = (id.xy - float(_Dimension) * 0.5) * (1.0 / _Scale);
 
-		pos.x += SimplexNoiseGrad(float3(pos.x, 0.0f, pos.z) * X_Noise_Offset) * Noise_Multiplier;
-		pos.z += SimplexNoiseGrad(float3(pos.x, 0.0f, pos.z) * Z_Noise_Offset) * Noise_Multiplier;
+	float nX = snoise3(float3(baseXZ.x, 0.0, baseXZ.y));
+	float nZ = snoise3(float3(baseXZ.x, 0.0, baseXZ.y));
 
-		float2 uv = pos.xz;
-		uv = (id.xy) * (1.0f / float(_Scale));
-		uv.xy /= float(_Dimension) * (1.0f / float(_Scale));
-		uv.y = 1 - uv.y;
-		uv.x = 1 - uv.x;
+	float4 pos = 0;
+	pos.xz = baseXZ;
+	pos.z += float(_Dimension) * 0.5;
+	pos.y  = 0.75f;
 
-		grass.position = pos;
-		grass.uv = uv;
+	float2 uvHM = id.xy / float(_Dimension);
+	float h = _HeightMap.SampleLevel(sampler_HeightMap, uvHM, 0).r;
+	pos.x += snoise3(float3(baseXZ.x, baseXZ.y, 0.0)) * _NoiseScale;
+	pos.z += snoise3(float3(baseXZ.x, baseXZ.y, 0.0)) * _NoiseScale;
+	pos.y += h * _DisplacementStrength;
 
-		_GrassDataBuffer[id.x + id.y * _Dimension] = grass;
-	}
+	float2 uv = pos.xz;
+	uv = (id.xy) * (1.0f / float(_Scale));
+	uv.xy /= float(_Dimension) * (1.0f / float(_Scale));
+	uv.y = 1 - uv.y;
+	uv.x = 1 - uv.x;
+
+	grass.position = pos;
+	grass.uv = uv;
+
+	_GrassDataBuffer[id.x + id.y * _Dimension] = grass;
 }

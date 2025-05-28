@@ -6,6 +6,7 @@ Shader "Unlit/BillboardGrass"
         _WindStrength ("Wind Strength", Range(0.5, 50.0)) = 1
         _CullingBias ("Cull Bias", Range(0.1, 1.0)) = 0.5
         _LODCutoff ("LOD Cutoff", Range(10.0, 500.0)) = 100
+        _QuadScale ("Quad Scale", Float) = 1.0
     }
     SubShader
     {
@@ -41,6 +42,7 @@ Shader "Unlit/BillboardGrass"
             };
 
             sampler2D _MainTex, _HeightMap;
+            float _QuadScale;
             float4 _MainTex_ST;
             StructuredBuffer<GrassData> _PositionBuffer;
             float _Rotation, _WindStrength, _CullingBias, _DisplacementStrength, _LODCutoff;
@@ -88,6 +90,8 @@ Shader "Unlit/BillboardGrass"
                 localPosition.x += v.uv.y * trigValue * grassPosition.w * localWindVariance * 0.6f;
                 localPosition.z += v.uv.y * trigValue * grassPosition.w * 0.4f;
                 // localPosition.y += v.uv.y * (0.5f + grassPosition.w);
+
+                localPosition = RotateAroundYInDegrees(v.vertex * _QuadScale, _Rotation).xyz;
 
                 float4 worldPosition = float4(grassPosition.xyz + localPosition, 1.0f);
 
