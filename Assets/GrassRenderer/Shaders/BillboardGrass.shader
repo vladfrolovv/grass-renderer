@@ -24,33 +24,43 @@ Shader "Unlit/BillboardGrass"
             #include "AutoLight.cginc"
             #include "../Resources/Random.cginc"
 
-            struct VertexData {
+            struct VertexData
+            {
                 float4 vertex : POSITION;
                 float2 uv : TEXCOORD0;
             };
 
-            struct v2f {
+            struct v2f
+            {
                 float2 uv : TEXCOORD0;
                 float4 vertex : SV_POSITION;
                 float saturationLevel : TEXCOORD1;
             };
 
-            struct GrassData {
+            struct GrassData
+            {
                 float4 position;
                 float2 uv;
             };
 
             sampler2D _MainTex, _HeightMap;
-            float _QuadScale;
             float4 _MainTex_ST;
             StructuredBuffer<GrassData> _PositionBuffer;
-            float _Rotation, _WindStrength, _CullingBias, _DisplacementStrength, _LODCutoff;
 
-            float4 RotateAroundYInDegrees (float4 vertex, float degrees) {
+            float _WindStrength;
+            float _CullingBias;
+            float _DisplacementStrength;
+            float _LODCutoff;
+            float _QuadScale;
+            float _Rotation;
+
+            float4 RotateAroundYInDegrees (float4 vertex, float degrees)
+            {
                 float alpha = degrees * UNITY_PI / 180.0;
                 float sina, cosa;
                 sincos(alpha, sina, cosa);
                 float2x2 m = float2x2(cosa, -sina, sina, cosa);
+
                 return float4(mul(m, vertex.xz), vertex.yw).xzyw;
             }
 
@@ -60,7 +70,8 @@ Shader "Unlit/BillboardGrass"
                 return dot(float4(p, 1), plane) < bias;
             }
 
-            bool cullVertex(float3 p, float bias) {
+            bool cullVertex(float3 p, float bias)
+            {
                 return  distance(_WorldSpaceCameraPos, p) > _LODCutoff ||
                         VertexIsBelowClipPlane(p, 0, bias) ||
                         VertexIsBelowClipPlane(p, 1, bias) ||
@@ -68,7 +79,8 @@ Shader "Unlit/BillboardGrass"
                         VertexIsBelowClipPlane(p, 3, -max(1.0f, _DisplacementStrength));
             }
 
-            v2f vert (VertexData v, uint instanceID : SV_INSTANCEID) {
+            v2f vert (VertexData v, uint instanceID : SV_INSTANCEID)
+            {
                 v2f o;
 
                 float3 localPosition = RotateAroundYInDegrees(v.vertex, _Rotation).xyz;
@@ -90,7 +102,9 @@ Shader "Unlit/BillboardGrass"
                 localPosition.z += v.uv.y * trigValue * grassPosition.w * 0.4f;
                 // localPosition.y += v.uv.y * (0.5f + grassPosition.w);
 
-                localPosition = RotateAroundYInDegrees(v.vertex * _QuadScale, _Rotation).xyz;
+                // localPosition = RotateAroundYInDegrees(v.vertex * _QuadScale, _Rotation).xyz;
+                localPosition *= _QuadScale;
+                localPosition = RotateAroundYInDegrees(float4(localPosition, 1), _Rotation).xyz;
 
                 float4 worldPosition = float4(grassPosition.xyz + localPosition, 1.0f);
 
