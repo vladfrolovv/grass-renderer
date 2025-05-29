@@ -1,4 +1,5 @@
 using GrassRenderer.Terrain;
+using GrassRenderer.Utilities;
 using UniRx;
 using UnityEngine;
 namespace GrassRenderer.BillboardGrass
@@ -12,7 +13,7 @@ namespace GrassRenderer.BillboardGrass
         private const int IndirectArgsStride = sizeof(uint) * IndirectArgsCount;
 
         [Header("Grass Settings")]
-        [SerializeField] private Vector3 _quadSize;
+        [SerializeField] private Vector3 _quadSize = new (500f, 500f, 500f);
         [SerializeField] private float _grassScale = 1.5f;
         [SerializeField] private float _noiseScale = 0.1f;
         [SerializeField] private Texture _heightMap;
@@ -20,25 +21,61 @@ namespace GrassRenderer.BillboardGrass
         [Header("Shape")]
         [SerializeField] private Mesh _grassMesh;
 
-        [Header("Shader")]
-        [SerializeField] private Material _grassMaterial;
-        [SerializeField] private string _positionBufferPropertyName = "_PositionBuffer";
-        [SerializeField] private string _rotationPropertyName = "_Rotation";
-        [SerializeField] private string _grassQuadScalePropertyName = "_QuadScale";
+        #region Grass Shader Properties
 
-        [Header("Compute Shader")]
-        [SerializeField] private string _computeShaderPath = "ComputeShaders/GrassPositionsCalculator";
-        [SerializeField] private string _dimensionsPropertyName = "_Dimension";
-        [SerializeField] private string _scalePropertyName = "_Scale";
-        [SerializeField] private string _displacementStrengthPropertyName = "_DisplacementStrength";
-        [SerializeField] private string _noiseScalePropertyName = "_NoiseScale";
-        [SerializeField] private string _heightMapPropertyName = "_HeightMap";
-        [SerializeField] private string _yOffsetPropertyName = "_YOffset";
-        [SerializeField] private string _grassDataBufferPropertyName = "_GrassDataBuffer";
-        [SerializeField] private string _grassMaterialPropertyName = "_GrassMaterial";
-        [SerializeField] private string _grassMeshPropertyName = "_GrassMesh";
+        [Header("Shader")]
+        [SerializeField] private bool _showGrassShaderProperties = true;
+        [SerializeField] private Material _grassMaterial;
+        [SerializeField, HideIf("_showGrassShaderProperties")]
+        private string _positionBufferPropertyName = "_PositionBuffer";
+
+        [SerializeField, HideIf("_showGrassShaderProperties")]
+        private string _rotationPropertyName = "_Rotation";
+
+        [SerializeField, HideIf("_showGrassShaderProperties")]
+        private string _grassQuadScalePropertyName = "_QuadScale";
+
+        #endregion
+
+        #region Compute Shader Properties
+
+        [Header("Grass Compute Shader")]
+        [SerializeField] private bool _showGrassComputeShaderProperties = true;
+        [SerializeField, HideIf("_showGrassComputeShaderProperties")]
+        private string _grassComputeShaderPath = "ComputeShaders/GrassPositionsCalculator";
+
+        [SerializeField, HideIf("_showGrassComputeShaderProperties")]
+        private string _dimensionsPropertyName = "_Dimension";
+
+        [SerializeField, HideIf("_showGrassComputeShaderProperties")]
+        private string _scalePropertyName = "_Scale";
+
+        [SerializeField, HideIf("_showGrassComputeShaderProperties")]
+        private string _displacementStrengthPropertyName = "_DisplacementStrength";
+
+        [SerializeField, HideIf("_showGrassComputeShaderProperties")]
+        private string _noiseScalePropertyName = "_NoiseScale";
+
+        [SerializeField, HideIf("_showGrassComputeShaderProperties")]
+        private string _heightMapPropertyName = "_HeightMap";
+
+        [SerializeField, HideIf("_showGrassComputeShaderProperties")]
+        private string _yOffsetPropertyName = "_YOffset";
+
+        [SerializeField, HideIf("_showGrassComputeShaderProperties")]
+        private string _grassDataBufferPropertyName = "_GrassDataBuffer";
+
+        [SerializeField, HideIf("_showGrassComputeShaderProperties")]
+        private string _grassMaterialPropertyName = "_GrassMaterial";
+
+        [SerializeField, HideIf("_showGrassComputeShaderProperties")]
+        private string _grassMeshPropertyName = "_GrassMesh";
+
+        #endregion
 
         private ComputeShader _grassInitializationShader;
+        private ComputeShader _windComputeShader;
+
         private ComputeBuffer _grassDataBuffer;
         private ComputeBuffer _argumentsBuffer;
 
@@ -53,7 +90,8 @@ namespace GrassRenderer.BillboardGrass
             _terrainInfo = terrainInfo;
             int resolution = _terrainInfo.TerrainSize * _terrainInfo.TerrainScale;
 
-            _grassInitializationShader = Resources.Load<ComputeShader>(_computeShaderPath);
+            _grassInitializationShader = Resources.Load<ComputeShader>(_grassComputeShaderPath);
+
             _grassDataBuffer = new ComputeBuffer(resolution * resolution, GrassDataStride);
             _argumentsBuffer = new ComputeBuffer(1, IndirectArgsStride, ComputeBufferType.IndirectArguments);
 
@@ -61,7 +99,7 @@ namespace GrassRenderer.BillboardGrass
             Observable.EveryUpdate().Subscribe(_ => OnGrassUpdate()).AddTo(this);
         }
 
-        public void UpdateGrassBuffer()
+        private void UpdateGrassBuffer()
         {
             UpgradeGrassInitialization();
             UpgradeGrassArguments();

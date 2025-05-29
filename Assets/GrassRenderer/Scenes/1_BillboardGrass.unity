@@ -572,19 +572,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca05751e71c1410794f8d43af7bedaf8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _quadSize: {x: 4791.3, y: 500, z: 500}
-  _noiseScale: 1
+  _quadSize: {x: -500, y: 200, z: 500}
+  _grassScale: 1.5
+  _noiseScale: 0.1
   _heightMap: {fileID: 2800000, guid: 59a08fa073f35489b98a05a79bd8730e, type: 3}
   _grassMesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+  _showGrassShaderProperties: 1
   _grassMaterial: {fileID: 2100000, guid: 71ebd298108844ad29f687f21ee54f19, type: 2}
   _positionBufferPropertyName: _PositionBuffer
   _rotationPropertyName: _Rotation
-  _computeShaderPath: ComputeShaders/GrassPositionsCalculator
+  _grassQuadScalePropertyName: _QuadScale
+  _showGrassComputeShaderProperties: 1
+  _grassComputeShaderPath: ComputeShaders/GrassPositionsCalculator
   _dimensionsPropertyName: _Dimension
   _scalePropertyName: _Scale
   _displacementStrengthPropertyName: _DisplacementStrength
   _noiseScalePropertyName: _NoiseScale
   _heightMapPropertyName: _HeightMap
+  _yOffsetPropertyName: _YOffset
   _grassDataBufferPropertyName: _GrassDataBuffer
   _grassMaterialPropertyName: _GrassMaterial
   _grassMeshPropertyName: _GrassMesh

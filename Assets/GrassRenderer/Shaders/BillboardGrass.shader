@@ -24,28 +24,32 @@ Shader "Unlit/BillboardGrass"
             #include "AutoLight.cginc"
             #include "../Resources/Random.cginc"
 
-            struct VertexData
+            // Input structure for the vertex shader
+            struct mesh_data
             {
                 float4 vertex : POSITION;
                 float2 uv : TEXCOORD0;
             };
 
-            struct v2f
+            // Interpolators for passing data from vertex to fragment shader
+            struct interpolators
             {
                 float2 uv : TEXCOORD0;
                 float4 vertex : SV_POSITION;
-                float saturationLevel : TEXCOORD1;
+                float saturation_level : TEXCOORD1;
             };
 
-            struct GrassData
+            struct grass_data
             {
                 float4 position;
                 float2 uv;
             };
 
-            sampler2D _MainTex, _HeightMap;
             float4 _MainTex_ST;
-            StructuredBuffer<GrassData> _PositionBuffer;
+            sampler2D _MainTex;
+            sampler2D _HeightMap;
+
+            StructuredBuffer<grass_data> _PositionBuffer;
 
             float _WindStrength;
             float _CullingBias;
@@ -54,7 +58,7 @@ Shader "Unlit/BillboardGrass"
             float _QuadScale;
             float _Rotation;
 
-            float4 RotateAroundYInDegrees (float4 vertex, float degrees)
+            float4 rotate_around_y_in_degrees (float4 vertex, float degrees)
             {
                 float alpha = degrees * UNITY_PI / 180.0;
                 float sina, cosa;
@@ -64,74 +68,77 @@ Shader "Unlit/BillboardGrass"
                 return float4(mul(m, vertex.xz), vertex.yw).xzyw;
             }
 
-            bool VertexIsBelowClipPlane(float3 p, int planeIndex, float bias) {
+            bool vertex_is_below_clip_plane(float3 p, int planeIndex, float bias) {
                 float4 plane = unity_CameraWorldClipPlanes[planeIndex];
 
                 return dot(float4(p, 1), plane) < bias;
             }
 
-            bool cullVertex(float3 p, float bias)
+            bool cull_vertex(float3 p, float bias)
             {
                 return  distance(_WorldSpaceCameraPos, p) > _LODCutoff ||
-                        VertexIsBelowClipPlane(p, 0, bias) ||
-                        VertexIsBelowClipPlane(p, 1, bias) ||
-                        VertexIsBelowClipPlane(p, 2, bias) ||
-                        VertexIsBelowClipPlane(p, 3, -max(1.0f, _DisplacementStrength));
+                        vertex_is_below_clip_plane(p, 0, bias) ||
+                        vertex_is_below_clip_plane(p, 1, bias) ||
+                        vertex_is_below_clip_plane(p, 2, bias) ||
+                        vertex_is_below_clip_plane(p, 3, -max(1.0f, _DisplacementStrength));
             }
 
-            v2f vert (VertexData v, uint instanceID : SV_INSTANCEID)
+            // vertex shader
+            interpolators vert (mesh_data v, uint instanceID : SV_INSTANCEID)
             {
-                v2f o;
+                interpolators o;
 
-                float3 localPosition = RotateAroundYInDegrees(v.vertex, _Rotation).xyz;
+                float3 local_position = rotate_around_y_in_degrees(v.vertex, _Rotation).xyz;
 
-                float localWindVariance = min(max(0.4f, randValue(instanceID)), 0.75f);
+                float local_wind_variance = min(max(0.4f, randValue(instanceID)), 0.75f);
 
                 float4 grassPosition = _PositionBuffer[instanceID].position;
 
-                float cosTime;
-                if (localWindVariance > 0.6f)
-                    cosTime = cos(_Time.y * (_WindStrength - (grassPosition.w - 1.0f)));
+                float cos_time;
+                if (local_wind_variance > 0.6f)
+                {
+                    cos_time = cos(_Time.y * (_WindStrength - (grassPosition.w - 1.0f)));
+                }
                 else
-                    cosTime = cos(_Time.y * ((_WindStrength - (grassPosition.w - 1.0f)) + localWindVariance * 0.1f));
+                {
+                    cos_time = cos(_Time.y * (_WindStrength - (grassPosition.w - 1.0f) + local_wind_variance * 0.1f));
+                }
 
+                float trig_value = cos_time * cos_time * 0.65f - local_wind_variance * 0.5f;
 
-                float trigValue = ((cosTime * cosTime) * 0.65f) - localWindVariance * 0.5f;
+                local_position.x += v.uv.y * trig_value * grassPosition.y * local_wind_variance * 0.6f;
+                local_position.z += v.uv.y * trig_value * grassPosition.y * 0.4f;
+                local_position *= _QuadScale;
 
-                localPosition.x += v.uv.y * trigValue * grassPosition.w * localWindVariance * 0.6f;
-                localPosition.z += v.uv.y * trigValue * grassPosition.w * 0.4f;
-                // localPosition.y += v.uv.y * (0.5f + grassPosition.w);
+                float4 worldPosition = float4(grassPosition.xyz + local_position, 1.0f);
 
-                // localPosition = RotateAroundYInDegrees(v.vertex * _QuadScale, _Rotation).xyz;
-                localPosition *= _QuadScale;
-                localPosition = RotateAroundYInDegrees(float4(localPosition, 1), _Rotation).xyz;
-
-                float4 worldPosition = float4(grassPosition.xyz + localPosition, 1.0f);
-
-                if (cullVertex(worldPosition, -_CullingBias * max(1.0f, _DisplacementStrength)))
+                if (cull_vertex(worldPosition, -_CullingBias * max(1.0f, _DisplacementStrength)))
+                {
                     o.vertex = 0.0f;
+                }
                 else
+                {
                     o.vertex = UnityObjectToClipPos(worldPosition);
+                }
 
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
-                o.saturationLevel = 1.0 - ((_PositionBuffer[instanceID].position.w - 1.0f) / 1.5f);
-                o.saturationLevel = max(o.saturationLevel, 0.5f);
+                o.saturation_level = 1.0 - (_PositionBuffer[instanceID].position.w - 1.0f) / 1.5f;
+                o.saturation_level = max(o.saturation_level, 0.5f);
 
                 return o;
             }
 
-            fixed4 frag (v2f i) : SV_Target {
+            // fragment shader
+            fixed4 frag (interpolators i) : SV_Target
+            {
                 fixed4 col = tex2D(_MainTex, i.uv);
                 clip(-(0.5 - col.a));
 
-                float luminance = LinearRgbToLuminance(col);
-
-                float saturation = lerp(1.0f, i.saturationLevel, i.uv.y * i.uv.y * i.uv.y);
+                float saturation = lerp(1.0f, i.saturation_level, i.uv.y * i.uv.y * i.uv.y);
                 col.r /= saturation;
 
-
-                float3 lightDir = _WorldSpaceLightPos0.xyz;
-                float ndotl = DotClamped(lightDir, normalize(float3(0, 1, 0)));
+                float3 light_direction = _WorldSpaceLightPos0.xyz;
+                float ndotl = DotClamped(light_direction, normalize(float3(0, 1, 0)));
 
                 return col * ndotl;
             }
