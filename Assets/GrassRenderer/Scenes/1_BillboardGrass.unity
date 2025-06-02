@@ -573,8 +573,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _quadSize: {x: -500, y: 200, z: 500}
-  _grassScale: 1.5
-  _noiseScale: 0.1
+  _grassScale: 2
+  _noiseScale: 1
   _heightMap: {fileID: 2800000, guid: 59a08fa073f35489b98a05a79bd8730e, type: 3}
   _grassMesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
   _showGrassShaderProperties: 1

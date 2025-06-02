@@ -38,37 +38,48 @@ namespace GrassRenderer.Analytics
                 FPS = 1f / Time.unscaledDeltaTime
             };
 
-            if (_targetCamera != null)
+            _frustumPlanes = GeometryUtility.CalculateFrustumPlanes(_targetCamera);
+
+            GetVisibleVerticesAndTriangles(out model.VisibleVertices, out model.VisibleTriangles);
+            GetGPUAndCPUFrameTime(out model.GPUFrameTimeMs, out model.CPUFrameTimeMs);
+
+            _frameData.Value = model;
+        }
+
+        private void GetVisibleVerticesAndTriangles(out int visibleVertices, out int visibleTriangles)
+        {
+            visibleVertices = 0;
+            visibleTriangles = 0;
+
+            foreach (MeshFilter meshFilter in _meshFilters)
             {
-                _frustumPlanes = GeometryUtility.CalculateFrustumPlanes(_targetCamera);
+                Renderer rend = meshFilter.GetComponent<Renderer>();
+                if (!rend || !rend.enabled || !rend.gameObject.activeInHierarchy) continue;
+                if (!GeometryUtility.TestPlanesAABB(_frustumPlanes, rend.bounds)) continue;
 
-                int tris = 0, verts = 0;
-                _meshFilters.ForEach(meshFilter =>
-                {
-                    Renderer rend = meshFilter.GetComponent<Renderer>();
-                    if (!rend || !rend.enabled || !rend.gameObject.activeInHierarchy) return;
-                    if (!GeometryUtility.TestPlanesAABB(_frustumPlanes, rend.bounds)) return;
+                Mesh mesh = meshFilter.sharedMesh;
+                if (mesh == null) continue;
 
-                    Mesh mesh = meshFilter.sharedMesh;
-                    if (mesh == null) return;
-
-                    verts += mesh.vertexCount;
-                    tris  += mesh.triangles.Length / 3;
-                });
-
-                model.VisibleVertices  = verts;
-                model.VisibleTriangles = tris;
+                visibleVertices += mesh.vertexCount;
+                visibleTriangles += mesh.triangles.Length / 3;
             }
+        }
 
+        private void GetGPUAndCPUFrameTime(out float gpuFrameTime, out float cpuFrameTime)
+        {
             FrameTimingManager.CaptureFrameTimings();
             FrameTiming[] ft = new FrameTiming[1];
             if (FrameTimingManager.GetLatestTimings(1, ft) > 0)
             {
-                model.CPUFrameTimeMs = (float)ft[0].cpuFrameTime;
-                model.GPUFrameTimeMs = (float)ft[0].gpuFrameTime;
+                gpuFrameTime = (float)ft[0].gpuFrameTime;
+                cpuFrameTime = (float)ft[0].cpuFrameTime;
             }
-
-            _frameData.Value = model;
+            else
+            {
+                gpuFrameTime = 0f;
+                cpuFrameTime = 0f;
+            }
         }
+
     }
 }

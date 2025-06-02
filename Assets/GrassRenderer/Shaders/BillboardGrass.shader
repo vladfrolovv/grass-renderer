@@ -3,7 +3,7 @@ Shader "Unlit/BillboardGrass"
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
-        _WindStrength ("Wind Strength", Range(0.5, 50.0)) = 1
+        _WindStrength ("Wind Strength", Range(0.0, 50.0)) = 1
         _CullingBias ("Cull Bias", Range(0.1, 1.0)) = 0.5
         _LODCutoff ("LOD Cutoff", Range(10.0, 500.0)) = 100
     }
@@ -83,7 +83,6 @@ Shader "Unlit/BillboardGrass"
                         vertex_is_below_clip_plane(p, 3, -max(1.0f, _DisplacementStrength));
             }
 
-            // vertex shader
             interpolators vert (mesh_data v, uint instanceID : SV_INSTANCEID)
             {
                 interpolators o;
@@ -128,7 +127,6 @@ Shader "Unlit/BillboardGrass"
                 return o;
             }
 
-            // fragment shader
             fixed4 frag (interpolators i) : SV_Target
             {
                 fixed4 col = tex2D(_MainTex, i.uv);

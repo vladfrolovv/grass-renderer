@@ -15,9 +15,7 @@ namespace GrassRenderer.MeshGrass
         public void Execute(int index, TransformAccess transform)
         {
             float sway = math.sin(Time) * Amplitude;
-            transform.rotation = quaternion.Euler(
-                sway * WindDirection.x,
-                transform.rotation.y,
+            transform.rotation = quaternion.Euler(sway * WindDirection.x, transform.rotation.y,
                 sway * WindDirection.z);
         }
 
