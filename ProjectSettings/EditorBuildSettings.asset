@@ -4,5 +4,14 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/GrassRenderer/Scenes/0_Menu.unity
+    guid: 2df3c756801774843a039f4576bb81d7
+  - enabled: 1
+    path: Assets/GrassRenderer/Scenes/1_MeshGrass.unity
+    guid: 107aced3b6b6847f18cfd70a4c15df1a
+  - enabled: 1
+    path: Assets/GrassRenderer/Scenes/2_BillboardGrass.unity
+    guid: 1bb8f3f60dc53cd49bcb7f167be8a564
   m_configObjects: {}

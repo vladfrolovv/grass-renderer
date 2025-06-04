@@ -88,11 +88,9 @@ Shader "Unlit/BillboardGrass"
                 interpolators o;
 
                 float3 local_position = rotate_around_y_in_degrees(v.vertex, _Rotation).xyz;
-
-                float local_wind_variance = min(max(0.4f, randValue(instanceID)), 0.75f);
-
                 float4 grassPosition = _PositionBuffer[instanceID].position;
 
+                float local_wind_variance = min(max(0.4f, randValue(instanceID)), 0.75f);
                 float cos_time;
                 if (local_wind_variance > 0.6f)
                 {

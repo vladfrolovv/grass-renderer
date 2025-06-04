@@ -1,7 +1,9 @@
 ﻿using System;
+using GrassRenderer.DataProxies;
 using GrassRenderer.Terrain;
 using GrassRenderer.Utilities;
 using UnityEngine;
+using Zenject;
 namespace GrassRenderer
 {
     public class TerrainMeshGenerator : MonoBehaviour
@@ -29,6 +31,8 @@ namespace GrassRenderer
         [SerializeField] private bool _upgradeGrassGenerator;
         [SerializeField] private GrassGenerator _grassGenerator;
 
+        private RenderingModeDataProxy _renderingModeDataProxy;
+
         private Mesh _terrainMesh;
         private Vector3[] _vertices;
         private int[] _triangles;
@@ -37,6 +41,12 @@ namespace GrassRenderer
 
         public int TerrainSize => _terrainSize * _sizeScale;
 
+        [Inject]
+        public void Construct(RenderingModeDataProxy renderingModeDataProxy)
+        {
+            _renderingModeDataProxy = renderingModeDataProxy;
+        }
+
         private void Awake()
         {
             GenerateNewTerrain();
@@ -44,6 +54,12 @@ namespace GrassRenderer
 
         public void GenerateNewTerrain()
         {
+            if (_renderingModeDataProxy.UseRenderingModeSettings)
+            {
+                _terrainSize = _renderingModeDataProxy.TerrainSize;
+                _useHeightMap = _renderingModeDataProxy.UseHeightMap;
+            }
+
             _info = new TerrainInfo(_heightMapTexture, _terrainHeight, TerrainSize, _sizeScale);
             _terrainMesh = new Mesh();
             if (_useHeightMap)

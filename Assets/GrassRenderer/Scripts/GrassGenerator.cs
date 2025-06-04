@@ -1,4 +1,5 @@
 using GrassRenderer.Analytics;
+using GrassRenderer.DataProxies;
 using GrassRenderer.Terrain;
 using UnityEngine;
 using Zenject;
