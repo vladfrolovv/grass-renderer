@@ -58,6 +58,7 @@ namespace GrassRenderer
             {
                 _terrainSize = _renderingModeDataProxy.TerrainSize;
                 _useHeightMap = _renderingModeDataProxy.UseHeightMap;
+                _terrainHeight = _renderingModeDataProxy.HeightScale;
             }
 
             _info = new TerrainInfo(_heightMapTexture, _terrainHeight, TerrainSize, _sizeScale);

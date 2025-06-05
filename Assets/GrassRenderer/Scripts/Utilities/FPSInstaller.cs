@@ -6,8 +6,7 @@ namespace GrassRenderer.Utilities
 
         private void Awake()
         {
-            Application.targetFrameRate = int.MaxValue;
-            QualitySettings.vSyncCount = 0;
+            Application.targetFrameRate = -1;
         }
 
     }

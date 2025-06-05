@@ -34,8 +34,8 @@ namespace GrassRenderer.Analytics
         {
             AnalyticsFrameModel model = new()
             {
-                DeltaTime = Time.unscaledDeltaTime,
-                FPS = 1f / Time.unscaledDeltaTime
+                DeltaTime = Time.deltaTime,
+                FPS = 1f / Time.deltaTime
             };
 
             _frustumPlanes = GeometryUtility.CalculateFrustumPlanes(_targetCamera);
